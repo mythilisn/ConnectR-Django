@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+  /* Page background */
+  body {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6); /* Indigo to blue */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Main container */
+  .note-container {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: linear-gradient(135deg, #7c3aed, #2563eb); /* Purple to blue */
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    color: white;
+  }
+
+  /* Title */
+  .note-container h1 {
+    font-size: 2.75rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Uploaded date */
+  .note-container p.upload-date {
+    opacity: 0.75;
+    font-size: 0.875rem;
+  }
+
+  /* Author info */
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0 1rem 0;
+  }
+  .author-info img {
+    width: 60px;
+    height: 60px;
+    border-radius: 9999px;
+    object-fit: cover;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  }
+  .author-info div p:first-child {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+  .author-info div p:last-child {
+    font-size: 0.875rem;
+    color: #d1d5db; /* Tailwind gray-300 */
+  }
+
+  /* Subject & Tags */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .tag {
+    background-color: rgba(139, 92, 246, 0.85); /* Purple-600 transparent */
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    user-select: none;
+  }
+  .tag.subject {
+    background-color: rgba(37, 99, 235, 0.85); /* Blue-600 transparent */
+  }
+
+  /* PDF preview */
+  .pdf-preview {
+    margin-top: 2rem;
+    background: white;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: inset 0 0 15px #00000066;
+  }
+  .pdf-preview iframe {
+    width: 100%;
+    height: 600px;
+  }
+
+  /* Description */
+  .description h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .description p {
+    color: #d1d5db; /* Tailwind gray-300 */
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: #d1d5db;
+  }
+
+  /* Buttons */
+  .buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+  }
+  .buttons a.download {
+    background-color: white;
+    color: #7c3aed; /* purple-700 */
+    font-weight: 700;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  .buttons a.download:hover {
+    background-color: #ede9fe; /* lighter purple */
+  }
+  .buttons a.report {
+    background-color: #dc2626; /* red-600 */
+    color: white;
+    font-weight: 700;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+  }
+  .buttons a.report:hover {
+    background-color: #b91c1c; /* red-700 */
+  }
+
+  /* Rating stars */
+  .rating-stars {
+    display: flex;
+    gap: 0.25rem;
+    font-size: 2rem;
+    color: #fbbf24; /* amber-400 */
+    cursor: pointer;
+  }
+  .rating-stars input[type="radio"] {
+    display: none;
+  }
+  .rating-stars label span {
+    transition: color 0.2s ease-in-out;
+  }
+  .rating-stars input[type="radio"]:checked ~ label span,
+  .rating-stars label:hover ~ label span,
+  .rating-stars label:hover span {
+    color: #f59e0b; /* amber-500 */
+  }
+
+  /* Average rating text */
+  .average-rating {
+    margin-top: 0.25rem;
+    color: #9ca3af; /* gray-400 */
+    font-size: 0.875rem;
+  }
+
+  /* Related Notes */
+  .related-notes h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .related-grid a {
+    background-color: rgba(110, 46, 255, 0.75); /* purple-700 transparent */
+    padding: 1rem;
+    border-radius: 1rem;
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.2s ease;
+    display: block;
+  }
+  .related-grid a:hover {
+    background-color: rgba(139, 92, 246, 0.9); /* purple-600 */
+  }
+  .related-grid h4 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+  .related-grid p {
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+</style>
+
+<div class="note-container">
+
+  <!-- Title -->
+  <h1>{{ note.title }}</h1>
+  <p class="upload-date">Uploaded on {{ note.uploaded_at|date:"F j, Y" }}</p>
+
+  <!-- Author Info -->
+  <div class="author-info">
+    <img src="{{ note.author.profile.image.url }}" alt="author" />
+    <div>
+      <p>{{ note.author.username }}</p>
+      <p>Note Contributor</p>
+    </div>
+  </div>
+
+  <!-- Subject & Tags -->
+  <div class="tags">
+    <span class="tag subject">📚 {{ note.subject }}</span>
+    {% for tag in note.tags.all %}
+      <span class="tag">#{{ tag.name }}</span>
+    {% endfor %}
+  </div>
+
+
+
+  <!-- Description -->
+  <div class="description">
+    <h2>📝 Description</h2>
+    <p>{{ note.description }}</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <p>⬇️ <strong>{{ note.download_count }}</strong> Downloads</p>
+    <p>🕒 Estimated Read: <strong>5 mins</strong></p>
+    <p>📁 File Type: <strong>{{ note.file.url|slice:"-3"|upper }}</strong></p>
+  </div>
+
+  <!-- Buttons -->
+  <div class="buttons">
+    <a href="{{ note.file.url }}" download class="download">📅 Download</a>
+    <a href="{% url 'report_note' note.id %}" class="report">🚩 Report</a>
+  </div>
+
+  <!-- Rating -->
+  <div class="mt-10">
+    <h3>🌟 Rate This Note</h3>
+    <form method="post" action="{% url 'rate_note' note.id %}" class="rating-stars">
+      {% csrf_token %}
+      {% for star in "12345" %}
+        <label for="star{{ star }}">
+          <input type="radio" id="star{{ star }}" name="rating" value="{{ star }}" onchange="this.form.submit();">
+          <span>⭐</span>
+        </label>
+      {% endfor %}
+    </form>
+    <p class="average-rating">Average Rating: <strong>{{ average_rating|default:"Not rated yet" }}</strong></p>
+  </div>
+
+  <!-- Related Notes -->
+  <div class="related-notes">
+    <h3>📌 More Notes from the author {{ note.author.username }}</h3>
+    <div class="related-grid">
+      {% for related_note in related_notes %}
+        <a href="{% url 'note_detail' related_note.id %}">
+          <h4>{{ related_note.title }}</h4>
+          <p> ({{ related_note.subject }})</p>
+        </a>
+      {% empty %}
+        <p>No other notes by this user yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
